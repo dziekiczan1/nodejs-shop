@@ -1,6 +1,6 @@
 const Sequalize = require("sequelize");
 
-const sequalize = requie("../utils/db");
+const sequalize = require("../util/db");
 
 const Product = sequalize.define("product", {
   id: {
