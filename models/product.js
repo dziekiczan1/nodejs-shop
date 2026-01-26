@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 
+const db = require("../util/db");
 const Cart = require("./cart");
 
 const p = path.join(
@@ -61,8 +62,8 @@ module.exports = class Product {
     });
   }
 
-  static fetchAll(cb) {
-    getProductsFromFile(cb);
+  static fetchAll() {
+    return db.execute("SELECT * FROM products");
   }
 
   static findById(id, cb) {
