@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 
 const errorController = require("./controllers/error");
 const mongoConnect = require("./util/db").mongoConnect;
+const User = require("./models/user");
 
 // const sequelize = require("./util/db");
 // const Product = require("./models/product");
@@ -28,14 +29,12 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Middleware to attach a user to each request
 app.use((req, res, next) => {
-  // MYSQL
-  // User.findByPk(1)
-  //   .then((user) => {
-  //     req.user = user;
-  //     next();
-  //   })
-  //   .catch((err) => console.log(err));
-  next();
+  User.findById("697bad0f5e124bc4b23f1fd1")
+    .then((user) => {
+      req.user = user;
+      next();
+    })
+    .catch((err) => console.log(err));
 });
 
 app.use("/admin", adminRoutes);
