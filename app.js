@@ -3,9 +3,10 @@ require("dotenv").config();
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const errorController = require("./controllers/error");
-const mongoConnect = require("./util/db").mongoConnect;
+// const mongoConnect = require("./util/db").mongoConnect;
 const User = require("./models/user");
 
 // const sequelize = require("./util/db");
@@ -29,9 +30,10 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Middleware to attach a user to each request
 app.use((req, res, next) => {
-  User.findById("697bad0f5e124bc4b23f1fd1")
+  User.findById("697c6dbc2698911e08e86833")
     .then((user) => {
-      req.user = new User(user.name, user.email, user.cart, user._id);
+      // req.user = new User(user.name, user.email, user.cart, user._id);
+      req.user = user;
       next();
     })
     .catch((err) => console.log(err));
@@ -77,6 +79,26 @@ app.use(errorController.get404);
 //   });
 
 // MONGODB
-mongoConnect(() => {
-  app.listen(3000);
-});
+// mongoConnect(() => {
+//   app.listen(3000);
+// });
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then((result) => {
+    User.findOne().then((user) => {
+      if (!user) {
+        const user = new User({
+          name: "Peter",
+          email: "peter@test.com",
+          cart: {
+            items: [],
+          },
+        });
+        user.save();
+      }
+    });
+    app.listen(3000);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
