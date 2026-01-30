@@ -86,16 +86,26 @@ class Product {
       });
   }
 
-  static deleteById(prodId) {
+  static deleteById(prodId, userId) {
     const db = getDb();
     return db
       .collection("products")
       .deleteOne({ _id: new mongodb.ObjectId(prodId) })
-      .then((product) => {
-        return product;
+      .then((result) => {
+        return db.collection("users").updateOne(
+          { _id: new mongodb.ObjectId(userId) },
+          {
+            $pull: {
+              "cart.items": { productId: new mongodb.ObjectId(prodId) },
+            },
+          },
+        );
       })
-      .catch((err) => {
-        console.log(err);
+      .then((result) => {
+        console.log("Cart Item Deleted");
+      })
+      .then(() => {
+        console.log("Product Deleted");
       });
   }
 }
