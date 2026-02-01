@@ -45,14 +45,25 @@ app.use(
 
 // Middleware to attach a user to each request
 app.use((req, res, next) => {
-  User.findById("697c6dbc2698911e08e86833")
+  if (!req.session.user) {
+    return next();
+  }
+  User.findById(req.session.user._id)
     .then((user) => {
-      // req.user = new User(user.name, user.email, user.cart, user._id);
       req.user = user;
       next();
     })
     .catch((err) => console.log(err));
 });
+// app.use((req, res, next) => {
+//   User.findById("697c6dbc2698911e08e86833")
+//     .then((user) => {
+//       // req.user = new User(user.name, user.email, user.cart, user._id);
+//       req.user = user;
+//       next();
+//     })
+//     .catch((err) => console.log(err));
+// });
 
 app.use("/admin", adminRoutes);
 app.use(authRoutes);
