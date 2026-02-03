@@ -246,7 +246,7 @@ exports.postEditProduct = (req, res, next) => {
         title: updatedTitle,
         imageUrl: updatedImageUrl,
         price: updatedPrice,
-        description: updatedDesc,
+        description: updatedDescription,
         _id: prodId,
       },
       errorMessage: errors.array()[0].msg,
@@ -256,6 +256,7 @@ exports.postEditProduct = (req, res, next) => {
 
   Product.findById(prodId)
     .then((product) => {
+      console.log(product);
       if (product.userId.toString() !== req.user._id.toString()) {
         return res.redirect("/");
       }
