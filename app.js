@@ -48,6 +48,13 @@ app.use(
 app.use(csrfProtection);
 app.use(flash());
 
+// Middleware to set local variables for views
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
+
 // Middleware to attach a user to each request
 app.use((req, res, next) => {
   if (!req.session.user) {
@@ -55,10 +62,15 @@ app.use((req, res, next) => {
   }
   User.findById(req.session.user._id)
     .then((user) => {
+      if (!user) {
+        return next();
+      }
       req.user = user;
       next();
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      next(new Error(err));
+    });
 });
 // app.use((req, res, next) => {
 //   User.findById("697c6dbc2698911e08e86833")
@@ -70,18 +82,20 @@ app.use((req, res, next) => {
 //     .catch((err) => console.log(err));
 // });
 
-// Middleware to set local variables for views
-app.use((req, res, next) => {
-  res.locals.isAuthenticated = req.session.isLoggedIn;
-  res.locals.csrfToken = req.csrfToken();
-  next();
-});
-
 app.use("/admin", adminRoutes);
 app.use(authRoutes);
 app.use(shopRoutes);
 
+app.get("/500", errorController.get500);
 app.use(errorController.get404);
+
+app.use((error, req, res, next) => {
+  // res.redirect("/500");
+  res.status(500).render("404", {
+    pageTitle: "Error",
+    path: "/500",
+  });
+});
 
 // MYSQL
 // Define model relationships
